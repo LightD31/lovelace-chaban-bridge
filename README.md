@@ -42,10 +42,10 @@ max_items: 5
 
 ## Options
 
-| Name      | Type   | Default | Description                                      |
-|-----------|--------|---------|--------------------------------------------------|
+| Name      | Type   | Default     | Description                                      |
+|-----------|--------|-------------|--------------------------------------------------|
 | entity    | string | **Required**| The entity ID of your Chaban Bridge sensor       |
-| max_items | number | 5       | Maximum number of closures to display (1-10)     |
+| max_items | number | 5           | Maximum number of closures to display (1-10)     |
 # Usage
 The card will automatically display the upcoming bridge closures based on the data provided by the specified entity. Each closure will show:
 
