@@ -29,7 +29,7 @@ La Carte Chaban Bridge est une carte personnalisée pour Home Assistant qui affi
    ```yaml
    lovelace:
      resources:
-       - url: /local/chaban-bridge-card.js
+       - url: /local/chaban-bridge.js
          type: module
    ```
 4. Redémarrez Home Assistant
@@ -46,7 +46,7 @@ max_items: 5
 ## Options
 | Nom       | Type    | Défaut      | Description                                           |
 |-----------|---------|-------------|-------------------------------------------------------|
-| entity    | string  | **Requis**  | L'ID de l'entité de votre capteur Chaban Bridge      |
+| entity    | string  | **Requis**  | L'ID de l'entité de votre capteur Chaban Bridge       |
 | max_items | nombre  | 5           | Nombre maximum de fermetures à afficher (1-10)        |
 
 # Utilisation
