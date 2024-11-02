@@ -86,7 +86,7 @@ class ChabanBridgeCardEditor extends LitElement {
   }
 }
 
-customElements.define('chaban-bridge-card-editor', ChabanBridgeCardEditor);
+customElements.define('chaban-bridge-editor', ChabanBridgeCardEditor);
 
 class ChabanBridgeCard extends LitElement {
   static get properties() {
@@ -147,7 +147,7 @@ class ChabanBridgeCard extends LitElement {
   `;
 
   static getConfigElement() {
-    return document.createElement("chaban-bridge-card-editor");
+    return document.createElement("chaban-bridge-editor");
   }
 
   static getStubConfig() {
@@ -263,12 +263,12 @@ class ChabanBridgeCard extends LitElement {
   }
 }
 
-customElements.define('chaban-bridge-card', ChabanBridgeCard);
+customElements.define('chaban-bridge', ChabanBridgeCard);
 
 // Add card to picker
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "chaban-bridge-card",
+  type: "chaban-bridge",
   name: "Fermetures Pont Chaban",
   description: "Carte affichant les prochaines fermetures du Pont Chaban"
 });
