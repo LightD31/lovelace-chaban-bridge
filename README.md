@@ -1,39 +1,42 @@
-# Chaban Bridge Card for Home Assistant
+# Carte Chaban Bridge pour Home Assistant
 
-The Chaban Bridge Card is a custom card for Home Assistant that displays upcoming closures of the Chaban-Delmas Bridge in Bordeaux, France. This card provides an easy-to-read interface for viewing scheduled bridge closures, helping residents and travelers plan their routes accordingly.
+La Carte Chaban Bridge est une carte personnalisée pour Home Assistant qui affiche les prochaines fermetures du Pont Chaban-Delmas à Bordeaux. Cette carte fournit une interface facile à lire pour visualiser les fermetures programmées du pont, aidant ainsi les résidents et les voyageurs à planifier leurs itinéraires.
 
-## Features
-
-- Displays upcoming bridge closures with detailed information
-- Configurable number of closures to display
-- Color-coded indicators for total and partial closures
-- Responsive design that adapts to your Home Assistant theme
+## Fonctionnalités
+- Affiche les prochaines fermetures du pont avec des informations détaillées
+- Nombre configurable de fermetures à afficher
+- Indicateurs colorés pour les fermetures totales et partielles
+- Design responsive qui s'adapte à votre thème Home Assistant
 
 ## Installation
 
-### HACS (Home Assistant Community Store)
+### Installation via HACS
+1. Assurez-vous que [HACS](https://hacs.xyz/) est installé dans votre instance Home Assistant
+2. Allez dans HACS → Frontend
+3. Cliquez sur les 3 points en haut à droite → Dépôts personnalisés
+4. Ajoutez le dépôt :
+   - URL : `https://github.com/LightD31/lovelace-chaban-bridge`
+   - Catégorie : `Lovelace`
+5. Cliquez sur "Ajouter"
+6. Cliquez sur le bouton "+" pour ajouter un nouveau dépôt
+7. Cherchez "Chaban Bridge Card" et installez-le
+8. Redémarrez Home Assistant
 
-1. Ensure that [HACS](https://hacs.xyz/) is installed in your Home Assistant instance.
-2. In the HACS panel, go to "Frontend" and click the "+" button.
-3. Search for "Chaban Bridge Card" and install it.
-4. Restart Home Assistant.
-
-### Manual Installation
-
-1. Download the `chaban-bridge-card.js` file from the `dist` folder in this repository.
-2. Copy the file to your `<config>/www/` directory.
-3. Add the following to your `configuration.yaml` file:
-
+### Installation manuelle
+1. Téléchargez le fichier `chaban-bridge.js` depuis le dossier `dist` de ce dépôt
+2. Copiez le fichier dans votre répertoire `<config>/www/`
+3. Ajoutez ce qui suit à votre fichier `configuration.yaml` :
    ```yaml
    lovelace:
      resources:
        - url: /local/chaban-bridge-card.js
          type: module
-    ```
-4. Restart Home Assistant
+   ```
+4. Redémarrez Home Assistant
 
 # Configuration
-## Add the card to your Lovelace UI:
+
+## Ajoutez la carte à votre interface Lovelace :
 ```yaml
 type: custom:chaban-bridge-card
 entity: sensor.chaban_bridge_next_5_closures
@@ -41,26 +44,21 @@ max_items: 5
 ```
 
 ## Options
+| Nom       | Type    | Défaut      | Description                                           |
+|-----------|---------|-------------|-------------------------------------------------------|
+| entity    | string  | **Requis**  | L'ID de l'entité de votre capteur Chaban Bridge      |
+| max_items | nombre  | 5           | Nombre maximum de fermetures à afficher (1-10)        |
 
-| Name      | Type   | Default     | Description                                      |
-|-----------|--------|-------------|--------------------------------------------------|
-| entity    | string | **Required**| The entity ID of your Chaban Bridge sensor       |
-| max_items | number | 5           | Maximum number of closures to display (1-10)     |
-# Usage
-The card will automatically display the upcoming bridge closures based on the data provided by the specified entity. Each closure will show:
+# Utilisation
+La carte affichera automatiquement les prochaines fermetures du pont en fonction des données fournies par l'entité spécifiée. Chaque fermeture affichera :
+- Nom du navire
+- Date de fermeture
+- Type de fermeture (totale ou partielle)
+- Heure de début de fermeture
+- Heure de réouverture
 
-- Ship name
+# Contribution
+Les contributions à la Carte Chaban Bridge sont les bienvenues ! N'hésitez pas à soumettre des pull requests ou à ouvrir des issues sur le dépôt GitHub.
 
-- Closure date
-
-- Closure type (total or partial)
-
-- Closure start time
-
-- Reopening time
-
-# Contributing
-Contributions to the Chaban Bridge Card are welcome! Please feel free to submit pull requests or open issues on the GitHub repository.
-
-# License
-This project is licensed under the MIT License - see the LICENSE file for details.
+# Licence
+Ce projet est sous licence MIT - voir le fichier LICENSE pour plus de détails.
