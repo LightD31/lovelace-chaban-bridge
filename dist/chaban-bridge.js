@@ -104,33 +104,8 @@ class ChabanBridgeCard extends LitElement {
     :host {
       --closure-border-radius: var(--ha-card-border-radius, 4px);
     }
-    .closure {
-      padding: 12px;
-      margin-bottom: 12px;
-      border-radius: var(--closure-border-radius);
-      background: var(--primary-background-color);
-    }
-    .closure.total {
-      border-left: 4px solid var(--error-color);
-    }
-    .closure-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .closure-reason {
-      font-weight: bold;
-    }
-    .closure-type {
-      color: var(--error-color);
-      font-size: 0.9em;
-    }
-    .closure-time {
-      color: var(--secondary-text-color);
-    }
     .bridge-status {
-      padding: 16px;
+      padding: 12px;
       margin-bottom: 16px;
       text-align: center;
       border-radius: var(--closure-border-radius);
@@ -141,6 +116,26 @@ class ChabanBridgeCard extends LitElement {
     }
     .bridge-status.closed {
       background: var(--error-color);
+    }
+    .current-state {
+      margin-bottom: 16px;
+    }
+    .closure {
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: var(--closure-border-radius);
+      background: var(--primary-background-color);
+      border: 1px solid var(--divider-color);
+    }
+    .closure-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .closure-dates {
+      font-size: 0.9em;
+      color: var(--secondary-text-color);
     }
   `
 
@@ -153,28 +148,34 @@ class ChabanBridgeCard extends LitElement {
 
   render() {
     if (!this._config || !this.hass) return html``;
-    
     this._stateObj = this.hass.states[this._config.entity];
     if (!this._stateObj) return html`Entity not found`;
 
     const maxItems = this._config.max_items || 5;
     const closures = this._stateObj.attributes.closures || [];
+    const isClosed = this._stateObj.attributes.is_closed === true;
 
     return html`
       <ha-card header="${this._stateObj.attributes.friendly_name}">
         <div class="card-content">
+          <div class="bridge-status ${isClosed ? 'closed' : 'open'}">
+            Pont ${isClosed ? 'Fermé' : 'Ouvert'}
+          </div>
           <div class="current-state">
-            État: ${this._stateObj.state}
-            <div class="last-update">
-              Dernière mise à jour: ${new Date(this._stateObj.attributes.last_update).toLocaleString()}
-            </div>
+            État: ${this._stateObj.state}<br />
+            Dernière mise à jour: ${new Date(this._stateObj.attributes.last_update).toLocaleString()}
           </div>
           <div class="closures">
             ${closures.slice(0, maxItems).map(closure => html`
               <div class="closure">
-                <div class="reason">${closure.reason}</div>
-                <div class="date">${new Date(closure.start_date).toLocaleString()}</div>
-                <div class="type">${closure.closure_type}</div>
+                <div class="closure-header">
+                  <span class="closure-reason">${closure.reason}</span>
+                  <span class="closure-type">${closure.closure_type}</span>
+                </div>
+                <div class="closure-dates">
+                  Du ${new Date(closure.start_date).toLocaleString()} au
+                  ${new Date(closure.end_date).toLocaleString()}
+                </div>
               </div>
             `)}
           </div>
