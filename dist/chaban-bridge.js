@@ -95,7 +95,8 @@ class ChabanBridgeCard extends LitElement {
   static get properties() {
     return {
       _config: { type: Object },
-      hass: { type: Object }
+      hass: { type: Object },
+      _stateObj: { type: Object }
     };
   }
 
@@ -151,43 +152,32 @@ class ChabanBridgeCard extends LitElement {
   }
 
   render() {
-    if (!this.hass || !this._config) {
-      return nothing;
-    }
-
-    const stateObj = this.hass.states[this._config.entity];
-    if (!stateObj) {
-      return html`
-        <ha-card>
-          <div class="card-content">
-            Entité non trouvée : ${this._config.entity}
-          </div>
-        </ha-card>
-      `;
-    }
+    if (!this._config || !this.hass) return html``;
+    
+    this._stateObj = this.hass.states[this._config.entity];
+    if (!this._stateObj) return html`Entity not found`;
 
     const maxItems = this._config.max_items || 5;
-    const closures = stateObj.attributes.closures.slice(0, maxItems);
-    const isOpen = stateObj.state === "0_OUVERT";
+    const closures = this._stateObj.attributes.closures || [];
 
     return html`
-      <ha-card>
+      <ha-card header="${this._stateObj.attributes.friendly_name}">
         <div class="card-content">
-          <div class="bridge-status ${isOpen ? 'open' : 'closed'}">
-            ${isOpen ? "Pont ouvert" : "Pont fermé"}
-          </div>
-          ${closures.map(closure => html`
-            <div class="closure total">
-              <div class="closure-header">
-                <span class="closure-reason">${closure.reason}</span>
-                <span class="closure-type">${closure.closure_type}</span>
-              </div>
-              <div class="closure-time">
-                ${new Date(closure.start_date).toLocaleString('fr-FR')} - 
-                ${new Date(closure.end_date).toLocaleString('fr-FR')}
-              </div>
+          <div class="current-state">
+            État: ${this._stateObj.state}
+            <div class="last-update">
+              Dernière mise à jour: ${new Date(this._stateObj.attributes.last_update).toLocaleString()}
             </div>
-          `)}
+          </div>
+          <div class="closures">
+            ${closures.slice(0, maxItems).map(closure => html`
+              <div class="closure">
+                <div class="reason">${closure.reason}</div>
+                <div class="date">${new Date(closure.start_date).toLocaleString()}</div>
+                <div class="type">${closure.closure_type}</div>
+              </div>
+            `)}
+          </div>
         </div>
       </ha-card>
     `;
