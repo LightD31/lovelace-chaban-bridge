@@ -100,63 +100,49 @@ class ChabanBridgeCard extends LitElement {
     };
   }
 
-  static get styles() {
-    return css`
-      ha-card {
-        padding: 16px;
-      }
-      .current-state {
-        display: flex;
-        align-items: center;
-        font-size: 1.2em;
-        margin-bottom: 16px;
-      }
-      .state-icon {
-        margin-right: 8px;
-        color: var(--primary-color);
-      }
-      .state-open {
-        color: var(--success-color);
-      }
-      .state-closed {
-        color: var(--error-color);
-      }
-      .last-update {
-        font-size: 0.8em;
-        color: var(--secondary-text-color);
-        margin-left: auto;
-      }
-      .closures {
-        display: grid;
-        gap: 12px;
-      }
-      .closure {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 8px;
-        padding: 12px;
-        border-radius: 8px;
-        background: var(--card-background-color);
-        box-shadow: var(--ha-card-box-shadow, none);
-      }
-      .closure-icon {
-        grid-row: span 2;
-        display: flex;
-        align-items: center;
-        color: var(--primary-color);
-      }
-      .reason {
-        font-weight: bold;
-      }
-      .date {
-        color: var(--secondary-text-color);
-      }
-      .type {
-        font-size: 0.9em;
-        color: var(--primary-color);
-      }
-    `;
-  }
+  static styles = css`
+    :host {
+      --closure-border-radius: var(--ha-card-border-radius, 4px);
+    }
+    .closure {
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: var(--closure-border-radius);
+      background: var(--primary-background-color);
+    }
+    .closure.total {
+      border-left: 4px solid var(--error-color);
+    }
+    .closure-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .closure-reason {
+      font-weight: bold;
+    }
+    .closure-type {
+      color: var(--error-color);
+      font-size: 0.9em;
+    }
+    .closure-time {
+      color: var(--secondary-text-color);
+    }
+    .bridge-status {
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+      border-radius: var(--closure-border-radius);
+      color: white;
+    }
+    .bridge-status.open {
+      background: var(--success-color);
+    }
+    .bridge-status.closed {
+      background: var(--error-color);
+    }
+  `
 
   setConfig(config) {
     if (!config.entity) {
@@ -166,40 +152,28 @@ class ChabanBridgeCard extends LitElement {
   }
 
   render() {
-    if (!this._stateObj) return html``;
+    if (!this._config || !this.hass) return html``;
     
-    const isOpen = this._stateObj.state === "0_OUVERT";
+    this._stateObj = this.hass.states[this._config.entity];
+    if (!this._stateObj) return html`Entity not found`;
+
+    const maxItems = this._config.max_items || 5;
     const closures = this._stateObj.attributes.closures || [];
-    const maxItems = 5;
 
     return html`
-      <ha-card>
+      <ha-card header="${this._stateObj.attributes.friendly_name}">
         <div class="card-content">
           <div class="current-state">
-            <ha-icon
-              class="state-icon"
-              icon="${isOpen ? 'mdi:gate-open' : 'mdi:gate'}"
-            ></ha-icon>
-            <span class="${isOpen ? 'state-open' : 'state-closed'}">
-              ${isOpen ? 'Pont Ouvert' : 'Pont Fermé'}
-            </span>
+            État: ${this._stateObj.state}
             <div class="last-update">
-              Mise à jour: ${new Date(this._stateObj.attributes.last_update).toLocaleTimeString()}
+              Dernière mise à jour: ${new Date(this._stateObj.attributes.last_update).toLocaleString()}
             </div>
           </div>
           <div class="closures">
             ${closures.slice(0, maxItems).map(closure => html`
               <div class="closure">
-                <div class="closure-icon">
-                  <ha-icon icon="${closure.reason === 'MAINTENANCE' ? 'mdi:wrench' : 'mdi:ferry'}"></ha-icon>
-                </div>
                 <div class="reason">${closure.reason}</div>
-                <div class="date">
-                  ${new Date(closure.start_date).toLocaleDateString()} 
-                  ${new Date(closure.start_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                  -
-                  ${new Date(closure.end_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                </div>
+                <div class="date">${new Date(closure.start_date).toLocaleString()}</div>
                 <div class="type">${closure.closure_type}</div>
               </div>
             `)}
