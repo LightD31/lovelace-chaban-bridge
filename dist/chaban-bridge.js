@@ -106,164 +106,80 @@ class ChabanBridgeCard extends LitElement {
       border-radius: var(--closure-border-radius);
       background: var(--primary-background-color);
     }
-    .closure:last-child {
-      margin-bottom: 0;
+    .closure.total {
+      border-left: 4px solid var(--error-color);
     }
     .closure-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 8px;
+    }
+    .closure-reason {
       font-weight: bold;
     }
-    .closure-time {
-      color: var(--primary-text-color);
-      opacity: 0.8;
-    }
-    .total-closure {
-      border-left: 3px solid var(--error-color);
-      padding-left: 12px;
-    }
-    .partial-closure {
-      border-left: 3px solid var(--warning-color);
-      padding-left: 12px;
-    }
-    .closure-details {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 8px;
+    .closure-type {
+      color: var(--error-color);
       font-size: 0.9em;
     }
-    .closure-label {
+    .closure-time {
       color: var(--secondary-text-color);
     }
-    .no-closures {
-      padding: 24px;
-      text-align: center;
-      color: var(--secondary-text-color);
-    }
-    .card-content {
+    .bridge-status {
       padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+      background: ${this.isOpen ? 'var(--success-color)' : 'var(--error-color)'};
+      color: white;
+      border-radius: var(--closure-border-radius);
     }
-  `;
-
-  static getConfigElement() {
-    return document.createElement("chaban-bridge-editor");
-  }
-
-  static getStubConfig() {
-    return {
-      entity: "sensor.chaban_bridge_next_5_closures",
-      max_items: 5
-    };
-  }
-
-  setConfig(config) {
-    if (!config.entity) {
-      throw new Error('Veuillez définir une entité');
-    }
-    this.config = config;
-  }
-
-  _formatDate(dateStr) {
-    try {
-      return new Date(dateStr).toLocaleDateString('fr-FR', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch (e) {
-      console.error('Error formatting date:', e);
-      return dateStr;
-    }
-  }
-
-  _formatTime(dateStr) {
-    try {
-      return new Date(dateStr).toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (e) {
-      console.error('Error formatting time:', e);
-      return dateStr;
-    }
-  }
-
-  _renderClosure(closure) {
-    return html`
-      <div class="closure ${closure.fermeture_totale ? 'total-closure' : 'partial-closure'}">
-        <div class="closure-header">
-          <div>${closure.bateau}</div>
-          <div class="closure-time">${this._formatDate(closure.date_passage)}</div>
-        </div>
-        <div class="closure-details">
-          <span class="closure-label">Type:</span>
-          <span>${closure.type_de_fermeture}</span>
-          <span class="closure-label">Fermeture:</span>
-          <span>${this._formatTime(closure.fermeture_a_la_circulation)}</span>
-          <span class="closure-label">Réouverture:</span>
-          <span>${this._formatTime(closure.re_ouverture_a_la_circulation)}</span>
-        </div>
-      </div>
-    `;
-  }
+  `
 
   render() {
-    if (!this.config || !this.hass) {
-      return html``;
+    if (!this.hass || !this.config) {
+      return nothing;
     }
 
-    const entityId = this.config.entity;
-    const state = this.hass.states[entityId];
+    const stateObj = this.hass.states[this.config.entity];
+    if (!stateObj) {
+      return html`
+        <ha-card>
+          <div class="card-content">
+            Entité non trouvée : ${this.config.entity}
+          </div>
+        </ha-card>
+      `;
+    }
+
     const maxItems = this.config.max_items || 5;
-
-    if (!state) {
-      return html`
-        <ha-card header="Fermetures du Pont Chaban">
-          <div class="card-content">
-            <div class="no-closures">
-              Aucune donnée disponible
-            </div>
-          </div>
-        </ha-card>
-      `;
-    }
-
-    let closures = state.attributes.closures || [];
-    
-    if (closures.length === 0) {
-      return html`
-        <ha-card header="Fermetures du Pont Chaban">
-          <div class="card-content">
-            <div class="no-closures">
-              Aucune fermeture prévue
-            </div>
-          </div>
-        </ha-card>
-      `;
-    }
-
-    // Sort closures by date and limit to max_items
-    closures = [...closures]
-      .sort((a, b) => new Date(a.date_passage).getTime() - new Date(b.date_passage).getTime())
-      .slice(0, maxItems);
+    const closures = stateObj.attributes.closures.slice(0, maxItems);
+    const isOpen = stateObj.state === "0_OUVERT";
 
     return html`
-      <ha-card header="Fermetures du Pont Chaban">
+      <ha-card>
         <div class="card-content">
-          ${closures.map(closure => this._renderClosure(closure))}
+          <div class="bridge-status">
+            ${isOpen ? "Pont ouvert" : "Pont fermé"}
+          </div>
+          ${closures.map(closure => html`
+            <div class="closure total">
+              <div class="closure-header">
+                <span class="closure-reason">${closure.reason}</span>
+                <span class="closure-type">${closure.closure_type}</span>
+              </div>
+              <div class="closure-time">
+                ${new Date(closure.start_date).toLocaleString('fr-FR')} - 
+                ${new Date(closure.end_date).toLocaleString('fr-FR')}
+              </div>
+            </div>
+          `)}
         </div>
       </ha-card>
     `;
   }
-
-  getCardSize() {
-    return Math.min(this.config?.max_items || 5, 7);
-  }
 }
 
-customElements.define('chaban-bridge', ChabanBridgeCard);
+customElements.define('chaban-bridge-card', ChabanBridgeCard);
 
 // Add card to picker
 window.customCards = window.customCards || [];
