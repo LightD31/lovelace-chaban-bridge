@@ -89,10 +89,14 @@ class ChabanBridgeCardEditor extends LitElement {
 customElements.define('chaban-bridge-editor', ChabanBridgeCardEditor);
 
 class ChabanBridgeCard extends LitElement {
+  static getConfigElement() {
+    return document.createElement("chaban-bridge-card-editor");
+  }
+
   static get properties() {
     return {
-      hass: { type: Object },
-      config: { type: Object },
+      _config: { type: Object },
+      hass: { type: Object }
     };
   }
 
@@ -134,6 +138,13 @@ class ChabanBridgeCard extends LitElement {
       border-radius: var(--closure-border-radius);
     }
   `
+
+  setConfig(config) {
+    if (!config.entity) {
+      throw new Error('Veuillez spécifier une entité sensor');
+    }
+    this._config = config;
+  }
 
   render() {
     if (!this.hass || !this.config) {
