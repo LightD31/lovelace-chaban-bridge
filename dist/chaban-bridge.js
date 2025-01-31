@@ -1,8 +1,7 @@
-// Home Assistant already provides these imports from their frontend
-// No need to include external dependencies
 const LitElement = Object.getPrototypeOf(customElements.get("ha-panel-lovelace"));
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
+const nothing = LitElement.prototype.nothing;
 
 class ChabanBridgeCardEditor extends LitElement {
   static get properties() {
@@ -133,9 +132,14 @@ class ChabanBridgeCard extends LitElement {
       padding: 16px;
       margin-bottom: 16px;
       text-align: center;
-      background: ${this.isOpen ? 'var(--success-color)' : 'var(--error-color)'};
-      color: white;
       border-radius: var(--closure-border-radius);
+      color: white;
+    }
+    .bridge-status.open {
+      background: var(--success-color);
+    }
+    .bridge-status.closed {
+      background: var(--error-color);
     }
   `
 
@@ -147,29 +151,29 @@ class ChabanBridgeCard extends LitElement {
   }
 
   render() {
-    if (!this.hass || !this.config) {
+    if (!this.hass || !this._config) {
       return nothing;
     }
 
-    const stateObj = this.hass.states[this.config.entity];
+    const stateObj = this.hass.states[this._config.entity];
     if (!stateObj) {
       return html`
         <ha-card>
           <div class="card-content">
-            Entité non trouvée : ${this.config.entity}
+            Entité non trouvée : ${this._config.entity}
           </div>
         </ha-card>
       `;
     }
 
-    const maxItems = this.config.max_items || 5;
+    const maxItems = this._config.max_items || 5;
     const closures = stateObj.attributes.closures.slice(0, maxItems);
     const isOpen = stateObj.state === "0_OUVERT";
 
     return html`
       <ha-card>
         <div class="card-content">
-          <div class="bridge-status">
+          <div class="bridge-status ${isOpen ? 'open' : 'closed'}">
             ${isOpen ? "Pont ouvert" : "Pont fermé"}
           </div>
           ${closures.map(closure => html`
