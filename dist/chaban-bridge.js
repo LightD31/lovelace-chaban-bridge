@@ -89,7 +89,8 @@ customElements.define('chaban-bridge-editor', ChabanBridgeCardEditor);
 
 class ChabanBridgeCard extends LitElement {
   static getConfigElement() {
-    return document.createElement("chaban-bridge-card-editor");
+    // Corriger le nom pour correspondre à celui défini dans customElements.define
+    return document.createElement("chaban-bridge-editor");
   }
 
   static getStubConfig() {
@@ -241,6 +242,21 @@ class ChabanBridgeCard extends LitElement {
       </ha-card>
     `;
   }
+
+  getCardSize() {
+    const maxItems = this._config?.max_items || 5;
+    // Base size + header + status + current state + items
+    return 1 + 1 + 1 + maxItems;
+  }
+
+  getLayoutOptions() {
+    return {
+      grid_rows: 4,
+      grid_columns: 2,
+      grid_min_rows: 3,
+      grid_max_rows: 6,
+    };
+  }
 }
 
 customElements.define('chaban-bridge-card', ChabanBridgeCard);
@@ -250,5 +266,7 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "chaban-bridge-card",
   name: "Pont Chaban",
-  description: "Affiche les prochaines fermetures du Pont Chaban"
+  description: "Affiche les prochaines fermetures du Pont Chaban",
+  preview: false,
+  documentationURL: "https://github.com/LightD31/chaban-bridge-card"
 });
