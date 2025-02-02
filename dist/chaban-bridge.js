@@ -103,6 +103,8 @@ class ChabanBridgeCard extends LitElement {
   static styles = css`
     :host {
       --closure-border-radius: var(--ha-card-border-radius, 4px);
+      --maintenance-color: #ff9800;
+      --boat-color: #2196f3;
     }
     .bridge-status {
       padding: 12px;
@@ -119,13 +121,29 @@ class ChabanBridgeCard extends LitElement {
     }
     .current-state {
       margin-bottom: 16px;
+      padding: 16px;
+      background: var(--card-background-color);
+      border-radius: var(--closure-border-radius);
+      border: 1px solid var(--divider-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .current-state ha-icon {
+      --mdc-icon-size: 24px;
     }
     .closure {
       padding: 12px;
       margin-bottom: 12px;
       border-radius: var(--closure-border-radius);
       background: var(--primary-background-color);
-      border: 1px solid var(--divider-color);
+      border-left: 4px solid var(--primary-color);
+    }
+    .closure[data-reason="MAINTENANCE"] {
+      border-left-color: var(--maintenance-color);
+    }
+    .closure:not([data-reason="MAINTENANCE"]) {
+      border-left-color: var(--boat-color);
     }
     .closure-header {
       display: flex;
@@ -136,6 +154,13 @@ class ChabanBridgeCard extends LitElement {
     .closure-dates {
       font-size: 0.9em;
       color: var(--secondary-text-color);
+    }
+    .closure-type {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.9em;
+      background: var(--primary-color);
+      color: var(--text-primary-color);
     }
   `
 
@@ -154,6 +179,20 @@ class ChabanBridgeCard extends LitElement {
     const maxItems = this._config.max_items || 5;
     const closures = this._stateObj.attributes.closures || [];
     const isClosed = this._stateObj.attributes.is_closed === true;
+    
+    const stateIcons = {
+      '0_OUVERT': 'mdi:bridge',
+      '1_FERMETURE_VALIDEE': 'mdi:bridge-lock',
+      '2_FERMETURE_EN_COURS': 'mdi:bridge-lock',
+      '3_FERME': 'mdi:bridge-lock'
+    };
+
+    const stateLabels = {
+      '0_OUVERT': 'Circulation normale',
+      '1_FERMETURE_VALIDEE': 'Fermeture validée',
+      '2_FERMETURE_EN_COURS': 'Fermeture en cours',
+      '3_FERME': 'Pont fermé'
+    };
 
     return html`
       <ha-card header="${this._stateObj.attributes.friendly_name}">
@@ -162,19 +201,31 @@ class ChabanBridgeCard extends LitElement {
             Pont ${isClosed ? 'Fermé' : 'Ouvert'}
           </div>
           <div class="current-state">
-            État: ${this._stateObj.state}<br />
-            Dernière mise à jour: ${new Date(this._stateObj.attributes.last_update).toLocaleString()}
+            <ha-icon icon="${stateIcons[this._stateObj.state]}"></ha-icon>
+            <div>
+              <strong>État actuel:</strong> ${stateLabels[this._stateObj.state]}<br>
+              <strong>Dernière mise à jour:</strong> ${new Date(this._stateObj.attributes.last_update).toLocaleString('fr-FR', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+              })}
+            </div>
           </div>
           <div class="closures">
             ${closures.slice(0, maxItems).map(closure => html`
-              <div class="closure">
+              <div class="closure" data-reason="${closure.reason}">
                 <div class="closure-header">
                   <span class="closure-reason">${closure.reason}</span>
                   <span class="closure-type">${closure.closure_type}</span>
                 </div>
                 <div class="closure-dates">
-                  Du ${new Date(closure.start_date).toLocaleString()} au
-                  ${new Date(closure.end_date).toLocaleString()}
+                  Du ${new Date(closure.start_date).toLocaleString('fr-FR', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                  })} au
+                  ${new Date(closure.end_date).toLocaleString('fr-FR', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                  })}
                 </div>
               </div>
             `)}
