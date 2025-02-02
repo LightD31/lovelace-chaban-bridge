@@ -8,6 +8,12 @@ Une carte personnalisée Home Assistant pour visualiser les prochaines fermeture
 - Indicateurs visuels pour fermetures totales/partielles 
 - Design adaptatif
 
+## Prérequis
+
+Cette carte est conçue pour fonctionner avec l'intégration [Chaban](https://github.com/LightD31/Chaban) qui fournit le sensor Home Assistant nécessaire pour les données de fermeture du pont.
+
+Assurez-vous d'avoir installé et configuré l'intégration Chaban avant d'utiliser cette carte.
+
 ## Installation
 
 ### Via HACS
