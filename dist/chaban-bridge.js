@@ -268,5 +268,5 @@ window.customCards.push({
   name: "Pont Chaban",
   description: "Affiche les prochaines fermetures du Pont Chaban",
   preview: false,
-  documentationURL: "https://github.com/LightD31/chaban-bridge-card"
+  documentationURL: "https://github.com/LightD31/lovelace-chaban-bridge"
 });
