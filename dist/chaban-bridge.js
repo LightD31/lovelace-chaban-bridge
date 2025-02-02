@@ -92,6 +92,13 @@ class ChabanBridgeCard extends LitElement {
     return document.createElement("chaban-bridge-card-editor");
   }
 
+  static getStubConfig() {
+    return {
+      entity: "sensor.pont_chaban_delmas",
+      max_items: 5
+    };
+  }
+
   static get properties() {
     return {
       _config: { type: Object },
@@ -241,7 +248,7 @@ customElements.define('chaban-bridge-card', ChabanBridgeCard);
 // Add card to picker
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "chaban-bridge",
-  name: "Fermetures Pont Chaban",
-  description: "Carte affichant les prochaines fermetures du Pont Chaban"
+  type: "chaban-bridge-card",
+  name: "Pont Chaban",
+  description: "Affiche les prochaines fermetures du Pont Chaban"
 });
