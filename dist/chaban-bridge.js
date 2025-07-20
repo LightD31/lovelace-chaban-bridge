@@ -120,6 +120,17 @@ class ChabanBridgeCard extends LitElement {
       --boat-color: #2196f3;
       --grid-cell-height: 56px;
     }
+    ha-card {
+      --ha-card-header-font-size: 1.1em;
+    }
+    ha-card .card-header {
+      height: 48px; /* 48px + 8px margin = 56px total */
+      padding: 8px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+    }
     .bridge-status {
       height: 48px; /* 48px + 8px margin = 56px total */
       padding: 8px 16px;
@@ -366,13 +377,14 @@ class ChabanBridgeCard extends LitElement {
     const actualItems = Math.min(maxItems, closures.length);
     
     // Calcul précis basé sur les hauteurs CSS fixes (chaque cellule = 56px)
+    // - Header : 1 ligne (56px)
     // - Statut du pont : 1 ligne (56px)
     // - État actuel : 1 ligne (56px)  
     // - Titre "Prochaines fermetures" : 1 ligne (56px) si il y a des fermetures
     // - Chaque fermeture : 1 ligne (56px)
     // - "Aucune fermeture" : 1 ligne (56px) si pas de fermetures
     
-    let totalRows = 2; // statut (1) + état actuel (1)
+    let totalRows = 3; // header (1) + statut (1) + état actuel (1)
     
     if (actualItems > 0) {
       totalRows += 1; // titre
@@ -388,8 +400,8 @@ class ChabanBridgeCard extends LitElement {
       min_columns: 6, // Minimum : moitié de largeur pour rester lisible
       max_columns: 12, // Maximum : toute la largeur
       rows: totalRows,
-      min_rows: 3, // Minimum : statut + état + message vide
-      max_rows: 15, // Maximum pour beaucoup de fermetures (1 + 1 + 1 + 10 + marge)
+      min_rows: 4, // Minimum : header + statut + état + message vide
+      max_rows: 16, // Maximum pour beaucoup de fermetures (1 + 1 + 1 + 1 + 10 + marge)
     };
   }
 
