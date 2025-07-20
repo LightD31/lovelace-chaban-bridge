@@ -121,7 +121,7 @@ class ChabanBridgeCard extends LitElement {
       --grid-cell-height: 56px;
     }
     .bridge-status {
-      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      height: 48px; /* 48px + 8px margin = 56px total */
       padding: 8px 16px;
       margin-bottom: 8px;
       text-align: center;
@@ -151,7 +151,7 @@ class ChabanBridgeCard extends LitElement {
       100% { opacity: 1; }
     }
     .current-state {
-      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      height: 48px; /* 48px + 8px margin = 56px total */
       margin-bottom: 8px;
       padding: 6px 16px;
       background: var(--card-background-color);
@@ -177,7 +177,7 @@ class ChabanBridgeCard extends LitElement {
       text-overflow: ellipsis;
     }
     .closures-title {
-      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      height: 48px; /* 48px + 8px margin = 56px total */
       margin: 0 0 8px 0;
       font-size: 1.1em;
       font-weight: bold;
@@ -186,7 +186,7 @@ class ChabanBridgeCard extends LitElement {
       box-sizing: border-box;
     }
     .closure {
-      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      height: 48px; /* 48px + 8px margin = 56px total */
       padding: 6px 16px;
       margin-bottom: 8px;
       border-radius: var(--closure-border-radius);
@@ -232,7 +232,7 @@ class ChabanBridgeCard extends LitElement {
       white-space: nowrap;
     }
     .no-closures {
-      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      height: 48px; /* 48px + 8px margin = 56px total */
       text-align: center;
       color: var(--secondary-text-color);
       display: flex;
@@ -304,13 +304,13 @@ class ChabanBridgeCard extends LitElement {
     let statusClass = 'open';
     let statusText = 'Ouvert';
     
-    if (state === '3' || state === 'closed' || state === '3_FERME') {
+    if (state === 'closed') {
       statusClass = 'closed';
       statusText = 'Fermé';
-    } else if (state === '2' || state === 'closing' || state === '2_FERMETURE_EN_COURS') {
+    } else if (state === 'closing') {
       statusClass = 'closing';
       statusText = 'Fermeture en cours';
-    } else if (state === '1' || state === 'closure_scheduled' || state === '1_FERMETURE_VALIDEE') {
+    } else if (state === 'closure_scheduled') {
       statusClass = 'closure-scheduled';
       statusText = 'Fermeture programmée';
     }
