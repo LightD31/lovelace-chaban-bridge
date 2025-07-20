@@ -132,15 +132,16 @@ class ChabanBridgeCard extends LitElement {
       box-sizing: border-box;
     }
     .bridge-status {
-      height: 48px; /* 48px + 8px margin = 56px total */
-      padding: 8px 16px;
+      min-height: 48px; /* Minimum height, can expand */
+      padding: 12px 16px;
       margin-bottom: 8px;
-      text-align: center;
       border-radius: var(--closure-border-radius);
       color: white;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       box-sizing: border-box;
     }
     .bridge-status.open {
@@ -161,30 +162,16 @@ class ChabanBridgeCard extends LitElement {
       50% { opacity: 0.7; }
       100% { opacity: 1; }
     }
-    .current-state {
-      min-height: 48px; /* 48px minimum + 8px margin = 56px minimum */
-      margin-bottom: 8px;
-      padding: 6px 16px;
-      background: var(--card-background-color);
-      border-radius: var(--closure-border-radius);
-      border: 1px solid var(--divider-color);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-sizing: border-box;
+    .bridge-status-main {
+      font-size: 1.2em;
+      font-weight: bold;
+      text-align: center;
     }
-    .current-state ha-icon {
-      --mdc-icon-size: 20px;
-      flex-shrink: 0;
-    }
-    .current-state-info {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      font-size: 1.4em;
-      line-height: 1.2;
+    .bridge-status-details {
+      font-size: 0.9em;
+      text-align: center;
+      opacity: 0.9;
+      line-height: 1.3;
     }
     .closures-title {
       height: 48px; /* 48px + 8px margin = 56px total */
@@ -347,20 +334,17 @@ class ChabanBridgeCard extends LitElement {
         <div class="card-content">
           <div class="card-title">${bridgeName}</div>
           <div class="bridge-status ${statusClass}">
-            Pont ${statusText}
-          </div>
-          <div class="current-state">
-            <ha-icon icon="${stateIcons[state] || 'mdi:bridge'}"></ha-icon>
-            <div class="current-state-info">
-              <strong>${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}</strong>
+            <div class="bridge-status-main">
+              Pont ${statusText}
+            </div>
+            <div class="bridge-status-details">
+              ${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}
               ${currentClosure ? html`
                 <br>
-                <span style="font-size: 0.9em; color: var(--secondary-text-color);">
-                  ${currentClosure.reason} • ${currentClosure.closure_type}
-                  <br>
-                  Fin prévue : ${this._formatDate(currentClosure.end_date)}
-                </span>
-              ` : (lastUpdate ? html` • ${this._formatDate(lastUpdate)}` : '')}
+                ${currentClosure.reason} • ${currentClosure.closure_type}
+                <br>
+                Fin prévue : ${this._formatDate(currentClosure.end_date)}
+              ` : (lastUpdate ? html`<br>Dernière mise à jour : ${this._formatDate(lastUpdate)}` : '')}
             </div>
           </div>
           <div class="closures">
@@ -409,17 +393,16 @@ class ChabanBridgeCard extends LitElement {
     
     // Calcul précis basé sur les hauteurs CSS fixes (chaque cellule = 56px)
     // - Header : 1 ligne (56px)
-    // - Statut du pont : 1 ligne (56px)
-    // - État actuel : 1 ligne (56px) ou 2 lignes (112px) si fermeture en cours
+    // - Statut du pont : 1 ligne (56px) ou plus si fermeture en cours avec détails
     // - Titre "Prochaines fermetures" : 1 ligne (56px) si il y a des fermetures
     // - Chaque fermeture : 1 ligne (56px)
     // - "Aucune fermeture" : 1 ligne (56px) si pas de fermetures
     
-    let totalRows = 3; // header (1) + statut (1) + état actuel (1)
+    let totalRows = 2; // header (1) + statut du pont (1 minimum)
     
-    // Si il y a une fermeture en cours, l'état actuel prend plus de place
+    // Si il y a une fermeture en cours, le statut du pont prend plus de place
     if (currentClosure) {
-      totalRows += 1; // ligne supplémentaire pour les détails de la fermeture
+      totalRows += 1; // ligne supplémentaire pour les détails de la fermeture dans le statut
     }
     
     if (actualItems > 0) {
@@ -436,7 +419,7 @@ class ChabanBridgeCard extends LitElement {
       min_columns: 6, // Minimum : moitié de largeur pour rester lisible
       max_columns: 12, // Maximum : toute la largeur
       rows: totalRows,
-      min_rows: 4, // Minimum : header + statut + état + message vide
+      min_rows: 3, // Minimum : header + statut + message vide
       max_rows: 17, // Maximum pour beaucoup de fermetures + ligne supplémentaire état
     };
   }
