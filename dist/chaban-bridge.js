@@ -120,14 +120,8 @@ class ChabanBridgeCard extends LitElement {
       --boat-color: #2196f3;
       --grid-cell-height: 56px;
     }
-    .card-content {
-      padding: 16px;
-      gap: 8px;
-      display: flex;
-      flex-direction: column;
-    }
     .bridge-status {
-      height: calc(var(--grid-cell-height) - 16px);
+      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
       padding: 8px 16px;
       margin-bottom: 8px;
       text-align: center;
@@ -157,9 +151,9 @@ class ChabanBridgeCard extends LitElement {
       100% { opacity: 1; }
     }
     .current-state {
-      height: calc(var(--grid-cell-height) - 16px);
+      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
       margin-bottom: 8px;
-      padding: 8px 16px;
+      padding: 6px 16px;
       background: var(--card-background-color);
       border-radius: var(--closure-border-radius);
       border: 1px solid var(--divider-color);
@@ -183,9 +177,8 @@ class ChabanBridgeCard extends LitElement {
       text-overflow: ellipsis;
     }
     .closures-title {
-      height: calc(var(--grid-cell-height) - 16px);
-      margin: 8px 0 8px 0;
-      padding: 8px 0;
+      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      margin: 0 0 8px 0;
       font-size: 1.1em;
       font-weight: bold;
       display: flex;
@@ -193,8 +186,8 @@ class ChabanBridgeCard extends LitElement {
       box-sizing: border-box;
     }
     .closure {
-      height: calc(var(--grid-cell-height) - 16px);
-      padding: 8px 16px;
+      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
+      padding: 6px 16px;
       margin-bottom: 8px;
       border-radius: var(--closure-border-radius);
       background: var(--primary-background-color);
@@ -203,9 +196,6 @@ class ChabanBridgeCard extends LitElement {
       align-items: center;
       justify-content: space-between;
       box-sizing: border-box;
-    }
-    .closure:last-child {
-      margin-bottom: 8px;
     }
     .closure[data-reason="MAINTENANCE"] {
       border-left-color: var(--maintenance-color);
@@ -242,8 +232,7 @@ class ChabanBridgeCard extends LitElement {
       white-space: nowrap;
     }
     .no-closures {
-      height: calc(var(--grid-cell-height) - 16px);
-      margin: 8px 0 8px 0;
+      height: calc(var(--grid-cell-height) - 16px); /* 1 ligne moins marges et espacement */
       text-align: center;
       color: var(--secondary-text-color);
       display: flex;
@@ -251,7 +240,6 @@ class ChabanBridgeCard extends LitElement {
       justify-content: center;
       font-style: italic;
       box-sizing: border-box;
-      padding: 8px;
     }
   `
 
