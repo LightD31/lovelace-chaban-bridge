@@ -121,9 +121,9 @@ class ChabanBridgeCard extends LitElement {
       --grid-cell-height: 56px;
     }
     .bridge-status {
-      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne moins marges */
-      padding: 12px 16px;
-      margin-bottom: 8px;
+      height: var(--grid-cell-height);
+      padding: 8px 16px;
+      margin-bottom: 0;
       text-align: center;
       border-radius: var(--closure-border-radius);
       color: white;
@@ -151,8 +151,8 @@ class ChabanBridgeCard extends LitElement {
       100% { opacity: 1; }
     }
     .current-state {
-      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne moins marges */
-      margin-bottom: 8px;
+      height: var(--grid-cell-height);
+      margin-bottom: 0;
       padding: 8px 16px;
       background: var(--card-background-color);
       border-radius: var(--closure-border-radius);
@@ -177,8 +177,9 @@ class ChabanBridgeCard extends LitElement {
       text-overflow: ellipsis;
     }
     .closures-title {
-      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne moins marges */
-      margin: 0 0 8px 0;
+      height: var(--grid-cell-height);
+      margin: 0;
+      padding: 8px 0;
       font-size: 1.1em;
       font-weight: bold;
       display: flex;
@@ -186,9 +187,9 @@ class ChabanBridgeCard extends LitElement {
       box-sizing: border-box;
     }
     .closure {
-      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne moins marges */
+      height: var(--grid-cell-height);
       padding: 8px 16px;
-      margin-bottom: 8px;
+      margin-bottom: 0;
       border-radius: var(--closure-border-radius);
       background: var(--primary-background-color);
       border-left: 4px solid var(--primary-color);
@@ -232,7 +233,7 @@ class ChabanBridgeCard extends LitElement {
       white-space: nowrap;
     }
     .no-closures {
-      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne */
+      height: var(--grid-cell-height);
       text-align: center;
       color: var(--secondary-text-color);
       display: flex;
@@ -240,6 +241,7 @@ class ChabanBridgeCard extends LitElement {
       justify-content: center;
       font-style: italic;
       box-sizing: border-box;
+      padding: 8px;
     }
   `
 
