@@ -113,13 +113,19 @@ class ChabanBridgeCard extends LitElement {
       --closure-border-radius: var(--ha-card-border-radius, 4px);
       --maintenance-color: #ff9800;
       --boat-color: #2196f3;
+      --grid-cell-height: 56px;
     }
     .bridge-status {
-      padding: 12px;
-      margin-bottom: 16px;
+      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne moins marges */
+      padding: 12px 16px;
+      margin-bottom: 8px;
       text-align: center;
       border-radius: var(--closure-border-radius);
       color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
     .bridge-status.open {
       background: var(--success-color);
@@ -127,25 +133,61 @@ class ChabanBridgeCard extends LitElement {
     .bridge-status.closed {
       background: var(--error-color);
     }
+    .bridge-status.closure-scheduled {
+      background: var(--warning-color);
+    }
+    .bridge-status.closing {
+      background: var(--error-color);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
     .current-state {
-      margin-bottom: 16px;
-      padding: 16px;
+      height: calc(var(--grid-cell-height) * 2 - 8px); /* 2 lignes moins marges */
+      margin-bottom: 8px;
+      padding: 12px 16px;
       background: var(--card-background-color);
       border-radius: var(--closure-border-radius);
       border: 1px solid var(--divider-color);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+      box-sizing: border-box;
     }
     .current-state ha-icon {
       --mdc-icon-size: 24px;
+      flex-shrink: 0;
+    }
+    .current-state-info {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .closures-title {
+      height: calc(var(--grid-cell-height) - 8px); /* 1 ligne moins marges */
+      margin: 0 0 8px 0;
+      font-size: 1.1em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
     }
     .closure {
-      padding: 12px;
-      margin-bottom: 12px;
+      height: calc(var(--grid-cell-height) * 2 - 8px); /* 2 lignes moins marges */
+      padding: 12px 16px;
+      margin-bottom: 8px;
       border-radius: var(--closure-border-radius);
       background: var(--primary-background-color);
       border-left: 4px solid var(--primary-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-sizing: border-box;
     }
     .closure[data-reason="MAINTENANCE"] {
       border-left-color: var(--maintenance-color);
@@ -156,19 +198,33 @@ class ChabanBridgeCard extends LitElement {
     .closure-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      line-height: 1.2;
     }
     .closure-dates {
       font-size: 0.9em;
       color: var(--secondary-text-color);
+      line-height: 1.3;
     }
     .closure-type {
       padding: 2px 8px;
       border-radius: 12px;
-      font-size: 0.9em;
+      font-size: 0.8em;
       background: var(--primary-color);
       color: var(--text-primary-color);
+      white-space: nowrap;
+    }
+    .no-closures {
+      height: calc(var(--grid-cell-height) * 2 - 8px); /* 2 lignes */
+      text-align: center;
+      color: var(--secondary-text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+      box-sizing: border-box;
     }
   `
 
@@ -186,57 +242,94 @@ class ChabanBridgeCard extends LitElement {
 
     const maxItems = this._config.max_items || 5;
     const closures = this._stateObj.attributes.closures || [];
-    const isClosed = this._stateObj.attributes.is_closed === true;
+    
+    // Support pour les nouvelles données du capteur
+    const currentState = this._stateObj.attributes.current_state || {};
+    const state = currentState.state || this._stateObj.state;
+    
+    // Détection de l'état fermé selon les nouveaux formats
+    let isClosed = false;
+    if (this._stateObj.attributes.is_closed === true || currentState.is_closed === true) {
+      isClosed = true;
+    } else if (state === '3' || state === 'closed' || state === '3_FERME') {
+      isClosed = true;
+    }
+    
+    const bridgeName = this._stateObj.attributes.bridge_name || this._stateObj.attributes.friendly_name || 'Pont Chaban-Delmas';
+    const lastUpdate = this._stateObj.attributes.last_update || currentState.last_update;
     
     const stateIcons = {
-      '0_OUVERT': 'mdi:bridge',
-      '1_FERMETURE_VALIDEE': 'mdi:bridge-lock',
-      '2_FERMETURE_EN_COURS': 'mdi:bridge-lock',
-      '3_FERME': 'mdi:bridge-lock'
+      'open': 'mdi:bridge',
+      'closure_scheduled': 'mdi:clock-alert',
+      'closing': 'mdi:bridge-lock',
+      'closed': 'mdi:bridge-lock'
     };
 
     const stateLabels = {
-      '0_OUVERT': 'Circulation normale',
-      '1_FERMETURE_VALIDEE': 'Fermeture validée',
-      '2_FERMETURE_EN_COURS': 'Fermeture en cours',
-      '3_FERME': 'Pont fermé'
+      'open': 'Circulation normale',
+      'closure_scheduled': 'Fermeture programmée',
+      'closing': 'Fermeture en cours',
+      'closed': 'Pont fermé'
     };
 
+    // Déterminer la classe CSS pour le statut du pont
+    let statusClass = 'open';
+    let statusText = 'Ouvert';
+    
+    if (state === '3' || state === 'closed' || state === '3_FERME') {
+      statusClass = 'closed';
+      statusText = 'Fermé';
+    } else if (state === '2' || state === 'closing' || state === '2_FERMETURE_EN_COURS') {
+      statusClass = 'closing';
+      statusText = 'Fermeture en cours';
+    } else if (state === '1' || state === 'closure_scheduled' || state === '1_FERMETURE_VALIDEE') {
+      statusClass = 'closure-scheduled';
+      statusText = 'Fermeture programmée';
+    }
+
     return html`
-      <ha-card header="${this._stateObj.attributes.friendly_name}">
+      <ha-card header="${bridgeName}">
         <div class="card-content">
-          <div class="bridge-status ${isClosed ? 'closed' : 'open'}">
-            Pont ${isClosed ? 'Fermé' : 'Ouvert'}
+          <div class="bridge-status ${statusClass}">
+            Pont ${statusText}
           </div>
           <div class="current-state">
-            <ha-icon icon="${stateIcons[this._stateObj.state]}"></ha-icon>
-            <div>
-              <strong>État actuel:</strong> ${stateLabels[this._stateObj.state]}<br>
-              <strong>Dernière mise à jour:</strong> ${new Date(this._stateObj.attributes.last_update).toLocaleString('fr-FR', {
+            <ha-icon icon="${stateIcons[state] || 'mdi:bridge'}"></ha-icon>
+            <div class="current-state-info">
+              <div><strong>État actuel:</strong> ${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}</div>
+              ${lastUpdate ? html`<div><strong>Dernière mise à jour:</strong> ${new Date(lastUpdate).toLocaleString('fr-FR', {
                 dateStyle: 'medium',
                 timeStyle: 'short'
-              })}
+              })}</div>` : ''}
             </div>
           </div>
           <div class="closures">
-            ${closures.slice(0, maxItems).map(closure => html`
-              <div class="closure" data-reason="${closure.reason}">
-                <div class="closure-header">
-                  <span class="closure-reason">${closure.reason}</span>
-                  <span class="closure-type">${closure.closure_type}</span>
+            ${closures.length > 0 ? html`
+              <div class="closures-title">Prochaines fermetures</div>
+              ${closures.slice(0, maxItems).map(closure => html`
+                <div class="closure" data-reason="${closure.reason}">
+                  <div class="closure-header">
+                    <span class="closure-reason">${closure.reason}</span>
+                    <span class="closure-type">${closure.closure_type}</span>
+                  </div>
+                  <div class="closure-dates">
+                    Du ${new Date(closure.start_date).toLocaleString('fr-FR', {
+                      dateStyle: 'short',
+                      timeStyle: 'short'
+                    })} au
+                    ${new Date(closure.end_date).toLocaleString('fr-FR', {
+                      dateStyle: 'short',
+                      timeStyle: 'short'
+                    })}
+                    ${closure.duration_minutes > 0 ? html` • Durée: ${Math.floor(closure.duration_minutes / 60)}h${closure.duration_minutes % 60 > 0 ? `${closure.duration_minutes % 60}min` : ''}` : ''}
+                  </div>
                 </div>
-                <div class="closure-dates">
-                  Du ${new Date(closure.start_date).toLocaleString('fr-FR', {
-                    dateStyle: 'medium',
-                    timeStyle: 'short'
-                  })} au
-                  ${new Date(closure.end_date).toLocaleString('fr-FR', {
-                    dateStyle: 'medium',
-                    timeStyle: 'short'
-                  })}
-                </div>
+              `)}
+            ` : html`
+              <div class="no-closures">
+                Aucune fermeture programmée
               </div>
-            `)}
+            `}
           </div>
         </div>
       </ha-card>
@@ -244,17 +337,50 @@ class ChabanBridgeCard extends LitElement {
   }
 
   getCardSize() {
-    const maxItems = this._config?.max_items || 5;
-    // Base size + header + status + current state + items
-    return 1 + 1 + 1 + maxItems;
+    // Utilise la même logique que getGridOptions() pour la cohérence
+    const gridOptions = this.getGridOptions();
+    return gridOptions.rows;
   }
 
-  getLayoutOptions() {
+  getGridOptions() {
+    const maxItems = this._config?.max_items || 5;
+    const closures = this.hass?.states[this._config?.entity]?.attributes?.closures || [];
+    const actualItems = Math.min(maxItems, closures.length);
+    
+    // Calcul précis basé sur les hauteurs CSS fixes (chaque cellule = 56px)
+    // - Statut du pont : 1 ligne (56px)
+    // - État actuel : 2 lignes (112px)  
+    // - Titre "Prochaines fermetures" : 1 ligne (56px) si il y a des fermetures
+    // - Chaque fermeture : 2 lignes (112px)
+    // - "Aucune fermeture" : 2 lignes (112px) si pas de fermetures
+    
+    let totalRows = 3; // statut (1) + état actuel (2)
+    
+    if (actualItems > 0) {
+      totalRows += 1; // titre
+      totalRows += actualItems * 2; // chaque fermeture prend 2 lignes
+    } else {
+      totalRows += 2; // message "aucune fermeture"
+    }
+    
     return {
-      grid_rows: 6,
-      grid_columns: 4,
-      grid_min_rows: 6,
-      grid_max_rows: 10,
+      columns: 6, // Prend la moitié de la largeur par défaut (multiple de 3)
+      min_columns: 3, // Minimum 1/4 de largeur
+      max_columns: 12, // Peut prendre toute la largeur si nécessaire
+      rows: totalRows,
+      min_rows: 5, // Minimum : statut + état + message vide
+      max_rows: 25, // Maximum pour beaucoup de fermetures (1 + 2 + 1 + 10*2 + marge)
+    };
+  }
+
+  // Méthode obsolète mais conservée pour compatibilité
+  getLayoutOptions() {
+    const gridOptions = this.getGridOptions();
+    return {
+      grid_rows: gridOptions.rows,
+      grid_columns: gridOptions.columns,
+      grid_min_rows: gridOptions.min_rows,
+      grid_max_rows: gridOptions.max_rows,
     };
   }
 }
