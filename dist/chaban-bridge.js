@@ -124,7 +124,7 @@ class ChabanBridgeCard extends LitElement {
       height: 48px; /* 48px + 8px margin = 56px total */
       padding: 8px 16px;
       margin-bottom: 8px;
-      font-size: 1.2em;
+      font-size: 1.4em;
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -182,7 +182,7 @@ class ChabanBridgeCard extends LitElement {
       min-height: 0;
       display: flex;
       align-items: center;
-      font-size: 0.9em;
+      font-size: 1.0em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -190,7 +190,7 @@ class ChabanBridgeCard extends LitElement {
     .closures-title {
       height: 48px; /* 48px + 8px margin = 56px total */
       margin: 0 0 8px 0;
-      font-size: 1.1em;
+      font-size: 1.2em;
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -219,7 +219,7 @@ class ChabanBridgeCard extends LitElement {
       align-items: center;
       gap: 8px;
       font-weight: bold;
-      font-size: 0.9em;
+      font-size: 1.0em;
       min-width: 0;
       flex: 1;
     }
@@ -229,7 +229,7 @@ class ChabanBridgeCard extends LitElement {
       text-overflow: ellipsis;
     }
     .closure-dates {
-      font-size: 0.8em;
+      font-size: 0.9em;
       color: var(--secondary-text-color);
       white-space: nowrap;
       flex-shrink: 0;
@@ -237,7 +237,7 @@ class ChabanBridgeCard extends LitElement {
     .closure-type {
       padding: 2px 8px;
       border-radius: 12px;
-      font-size: 0.8em;
+      font-size: 0.85em;
       background: var(--primary-color);
       color: var(--text-primary-color);
       white-space: nowrap;
