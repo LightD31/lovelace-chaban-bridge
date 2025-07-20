@@ -338,13 +338,11 @@ class ChabanBridgeCard extends LitElement {
               Pont ${statusText}
             </div>
             <div class="bridge-status-details">
-              ${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}
               ${currentClosure ? html`
-                <br>
                 ${currentClosure.reason} • ${currentClosure.closure_type}
                 <br>
                 Fin prévue : ${this._formatDate(currentClosure.end_date)}
-              ` : (lastUpdate ? html`<br>Dernière mise à jour : ${this._formatDate(lastUpdate)}` : '')}
+              ` : (lastUpdate ? html`Dernière mise à jour : ${this._formatDate(lastUpdate)}` : '')}
             </div>
           </div>
           <div class="closures">
