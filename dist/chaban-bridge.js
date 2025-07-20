@@ -162,7 +162,7 @@ class ChabanBridgeCard extends LitElement {
       100% { opacity: 1; }
     }
     .current-state {
-      height: 48px; /* 48px + 8px margin = 56px total */
+      min-height: 48px; /* 48px minimum + 8px margin = 56px minimum */
       margin-bottom: 8px;
       padding: 6px 16px;
       background: var(--card-background-color);
@@ -181,11 +181,10 @@ class ChabanBridgeCard extends LitElement {
       flex: 1;
       min-height: 0;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      justify-content: center;
       font-size: 1.4em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.2;
     }
     .closures-title {
       height: 48px; /* 48px + 8px margin = 56px total */
@@ -274,6 +273,20 @@ class ChabanBridgeCard extends LitElement {
     return `${day} ${month} ${hours}:${minutes}`;
   }
 
+  // Fonction pour trouver la fermeture actuellement en cours
+  _getCurrentClosure(closures) {
+    if (!closures || closures.length === 0) return null;
+    
+    const now = new Date();
+    
+    // Chercher une fermeture qui est actuellement active
+    return closures.find(closure => {
+      const startDate = new Date(closure.start_date);
+      const endDate = new Date(closure.end_date);
+      return now >= startDate && now <= endDate;
+    });
+  }
+
   render() {
     if (!this._config || !this.hass) return html``;
     this._stateObj = this.hass.states[this._config.entity];
@@ -296,6 +309,9 @@ class ChabanBridgeCard extends LitElement {
     
     const bridgeName = this._stateObj.attributes.bridge_name || this._stateObj.attributes.friendly_name || 'Pont Chaban-Delmas';
     const lastUpdate = this._stateObj.attributes.last_update || currentState.last_update;
+    
+    // Trouver la fermeture en cours si le pont est fermé
+    const currentClosure = (isClosed || state === 'closed' || state === 'closing') ? this._getCurrentClosure(closures) : null;
     
     const stateIcons = {
       'open': 'mdi:bridge',
@@ -337,7 +353,14 @@ class ChabanBridgeCard extends LitElement {
             <ha-icon icon="${stateIcons[state] || 'mdi:bridge'}"></ha-icon>
             <div class="current-state-info">
               <strong>${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}</strong>
-              ${lastUpdate ? html` • ${this._formatDate(lastUpdate)}` : ''}
+              ${currentClosure ? html`
+                <br>
+                <span style="font-size: 0.9em; color: var(--secondary-text-color);">
+                  ${currentClosure.reason} • ${currentClosure.closure_type}
+                  <br>
+                  Fin prévue : ${this._formatDate(currentClosure.end_date)}
+                </span>
+              ` : (lastUpdate ? html` • ${this._formatDate(lastUpdate)}` : '')}
             </div>
           </div>
           <div class="closures">
@@ -377,15 +400,27 @@ class ChabanBridgeCard extends LitElement {
     const closures = this.hass?.states[this._config?.entity]?.attributes?.closures || [];
     const actualItems = Math.min(maxItems, closures.length);
     
+    // Vérifier si le pont est fermé et s'il y a une fermeture en cours
+    const state = this.hass?.states[this._config?.entity]?.attributes?.current_state?.state || this.hass?.states[this._config?.entity]?.state;
+    const isClosed = this.hass?.states[this._config?.entity]?.attributes?.is_closed === true || 
+                     this.hass?.states[this._config?.entity]?.attributes?.current_state?.is_closed === true ||
+                     state === '3' || state === 'closed' || state === '3_FERME';
+    const currentClosure = (isClosed || state === 'closed' || state === 'closing') ? this._getCurrentClosure(closures) : null;
+    
     // Calcul précis basé sur les hauteurs CSS fixes (chaque cellule = 56px)
     // - Header : 1 ligne (56px)
     // - Statut du pont : 1 ligne (56px)
-    // - État actuel : 1 ligne (56px)  
+    // - État actuel : 1 ligne (56px) ou 2 lignes (112px) si fermeture en cours
     // - Titre "Prochaines fermetures" : 1 ligne (56px) si il y a des fermetures
     // - Chaque fermeture : 1 ligne (56px)
     // - "Aucune fermeture" : 1 ligne (56px) si pas de fermetures
     
     let totalRows = 3; // header (1) + statut (1) + état actuel (1)
+    
+    // Si il y a une fermeture en cours, l'état actuel prend plus de place
+    if (currentClosure) {
+      totalRows += 1; // ligne supplémentaire pour les détails de la fermeture
+    }
     
     if (actualItems > 0) {
       totalRows += 1; // titre
@@ -402,7 +437,7 @@ class ChabanBridgeCard extends LitElement {
       max_columns: 12, // Maximum : toute la largeur
       rows: totalRows,
       min_rows: 4, // Minimum : header + statut + état + message vide
-      max_rows: 16, // Maximum pour beaucoup de fermetures (1 + 1 + 1 + 1 + 10 + marge)
+      max_rows: 17, // Maximum pour beaucoup de fermetures + ligne supplémentaire état
     };
   }
 
