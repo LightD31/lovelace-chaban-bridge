@@ -313,8 +313,10 @@ class ChabanBridgeCard extends LitElement {
             <div class="current-state-info">
               <strong>${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}</strong>
               ${lastUpdate ? html` • ${new Date(lastUpdate).toLocaleString('fr-FR', {
-                dateStyle: 'short',
-                timeStyle: 'short'
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
               })}` : ''}
             </div>
           </div>
@@ -329,11 +331,15 @@ class ChabanBridgeCard extends LitElement {
                   </div>
                   <div class="closure-dates">
                     ${new Date(closure.start_date).toLocaleString('fr-FR', {
-                      dateStyle: 'short',
-                      timeStyle: 'short'
+                      day: '2-digit',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })} - ${new Date(closure.end_date).toLocaleString('fr-FR', {
-                      dateStyle: 'short',
-                      timeStyle: 'short'
+                      day: '2-digit',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
                     ${closure.duration_minutes > 0 ? html` (${Math.floor(closure.duration_minutes / 60)}h${closure.duration_minutes % 60 > 0 ? `${closure.duration_minutes % 60}min` : ''})` : ''}
                   </div>
