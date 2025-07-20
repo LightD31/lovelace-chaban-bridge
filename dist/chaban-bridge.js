@@ -120,15 +120,15 @@ class ChabanBridgeCard extends LitElement {
       --boat-color: #2196f3;
       --grid-cell-height: 56px;
     }
-    ha-card {
-      --ha-card-header-font-size: 1.1em;
-    }
-    ha-card .card-header {
+    .card-title {
       height: 48px; /* 48px + 8px margin = 56px total */
       padding: 8px 16px;
       margin-bottom: 8px;
+      font-size: 1.2em;
+      font-weight: bold;
       display: flex;
       align-items: center;
+      color: var(--primary-text-color);
       box-sizing: border-box;
     }
     .bridge-status {
@@ -327,8 +327,9 @@ class ChabanBridgeCard extends LitElement {
     }
 
     return html`
-      <ha-card header="${bridgeName}">
+      <ha-card>
         <div class="card-content">
+          <div class="card-title">${bridgeName}</div>
           <div class="bridge-status ${statusClass}">
             Pont ${statusText}
           </div>
