@@ -250,6 +250,19 @@ class ChabanBridgeCard extends LitElement {
     this._config = config;
   }
 
+  // Fonction pour formater les dates au format JJ MMM HH:MM
+  _formatDate(dateString) {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const day = date.getDate().toString();
+    const month = date.toLocaleDateString('fr-FR', { month: 'short' });
+    const hours = date.getHours().toString();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    
+    return `${day} ${month} ${hours}:${minutes}`;
+  }
+
   render() {
     if (!this._config || !this.hass) return html``;
     this._stateObj = this.hass.states[this._config.entity];
@@ -312,12 +325,7 @@ class ChabanBridgeCard extends LitElement {
             <ha-icon icon="${stateIcons[state] || 'mdi:bridge'}"></ha-icon>
             <div class="current-state-info">
               <strong>${stateLabels[state] || (isClosed ? 'Pont fermé' : 'Circulation normale')}</strong>
-              ${lastUpdate ? html` • ${new Date(lastUpdate).toLocaleString('fr-FR', {
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}` : ''}
+              ${lastUpdate ? html` • ${this._formatDate(lastUpdate)}` : ''}
             </div>
           </div>
           <div class="closures">
@@ -330,17 +338,7 @@ class ChabanBridgeCard extends LitElement {
                     <span class="closure-type">${closure.closure_type}</span>
                   </div>
                   <div class="closure-dates">
-                    ${new Date(closure.start_date).toLocaleString('fr-FR', {
-                      day: '2-digit',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })} - ${new Date(closure.end_date).toLocaleString('fr-FR', {
-                      day: '2-digit',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                    ${this._formatDate(closure.start_date)} - ${this._formatDate(closure.end_date)}
                     ${closure.duration_minutes > 0 ? html` (${Math.floor(closure.duration_minutes / 60)}h${closure.duration_minutes % 60 > 0 ? `${closure.duration_minutes % 60}min` : ''})` : ''}
                   </div>
                 </div>
