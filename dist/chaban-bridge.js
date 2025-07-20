@@ -121,9 +121,9 @@ class ChabanBridgeCard extends LitElement {
       --grid-cell-height: 56px;
     }
     .bridge-status {
-      height: var(--grid-cell-height);
+      height: calc(var(--grid-cell-height) - 16px);
       padding: 8px 16px;
-      margin-bottom: 0;
+      margin-bottom: 8px;
       text-align: center;
       border-radius: var(--closure-border-radius);
       color: white;
@@ -151,8 +151,8 @@ class ChabanBridgeCard extends LitElement {
       100% { opacity: 1; }
     }
     .current-state {
-      height: var(--grid-cell-height);
-      margin-bottom: 0;
+      height: calc(var(--grid-cell-height) - 16px);
+      margin-bottom: 8px;
       padding: 8px 16px;
       background: var(--card-background-color);
       border-radius: var(--closure-border-radius);
@@ -177,8 +177,8 @@ class ChabanBridgeCard extends LitElement {
       text-overflow: ellipsis;
     }
     .closures-title {
-      height: var(--grid-cell-height);
-      margin: 0;
+      height: calc(var(--grid-cell-height) - 16px);
+      margin: 0 0 8px 0;
       padding: 8px 0;
       font-size: 1.1em;
       font-weight: bold;
@@ -187,9 +187,9 @@ class ChabanBridgeCard extends LitElement {
       box-sizing: border-box;
     }
     .closure {
-      height: var(--grid-cell-height);
+      height: calc(var(--grid-cell-height) - 16px);
       padding: 8px 16px;
-      margin-bottom: 0;
+      margin-bottom: 8px;
       border-radius: var(--closure-border-radius);
       background: var(--primary-background-color);
       border-left: 4px solid var(--primary-color);
@@ -233,7 +233,8 @@ class ChabanBridgeCard extends LitElement {
       white-space: nowrap;
     }
     .no-closures {
-      height: var(--grid-cell-height);
+      height: calc(var(--grid-cell-height) - 16px);
+      margin-bottom: 8px;
       text-align: center;
       color: var(--secondary-text-color);
       display: flex;
