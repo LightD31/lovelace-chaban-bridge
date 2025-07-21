@@ -260,6 +260,32 @@ class ChabanBridgeCard extends LitElement {
     return `${day} ${month} ${hours}:${minutes}`;
   }
 
+  // Fonction pour formater une plage de dates de manière intelligente
+  _formatDateRange(startDateString, endDateString) {
+    if (!startDateString || !endDateString) return '';
+    
+    const startDate = new Date(startDateString);
+    const endDate = new Date(endDateString);
+    
+    const startDay = startDate.getDate().toString();
+    const startMonth = startDate.toLocaleDateString('fr-FR', { month: 'short' });
+    const startHours = startDate.getHours().toString();
+    const startMinutes = startDate.getMinutes().toString().padStart(2, '0');
+    
+    const endDay = endDate.getDate().toString();
+    const endMonth = endDate.toLocaleDateString('fr-FR', { month: 'short' });
+    const endHours = endDate.getHours().toString();
+    const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+    
+    // Si c'est le même jour, on n'affiche le jour et le mois qu'une seule fois
+    if (startDate.toDateString() === endDate.toDateString()) {
+      return `${startDay} ${startMonth} ${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+    }
+    
+    // Si ce sont des jours différents, on affiche les deux dates complètes
+    return `${startDay} ${startMonth} ${startHours}:${startMinutes} - ${endDay} ${endMonth} ${endHours}:${endMinutes}`;
+  }
+
   // Fonction pour trouver la fermeture actuellement en cours
   _getCurrentClosure(closures) {
     if (!closures || closures.length === 0) return null;
@@ -355,7 +381,7 @@ class ChabanBridgeCard extends LitElement {
                     <span class="closure-type">${closure.closure_type}</span>
                   </div>
                   <div class="closure-dates">
-                    ${this._formatDate(closure.start_date)} - ${this._formatDate(closure.end_date)}
+                    ${this._formatDateRange(closure.start_date, closure.end_date)}
                     ${closure.duration_minutes > 0 ? html` (${Math.floor(closure.duration_minutes / 60)}h${closure.duration_minutes % 60 > 0 ? `${closure.duration_minutes % 60}min` : ''})` : ''}
                   </div>
                 </div>
